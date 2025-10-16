@@ -4,11 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulário ETEC</title>
-    <!-- Adicionando o script do Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
     <style>
-        /* O restante do CSS permanece o mesmo */
+        /* O CSS permanece o mesmo */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             max-width: 450px;
@@ -216,24 +215,21 @@
     </div>
 
     <script>
-        // Sua configuração do Firebase. Substitua isso pela sua!
         const firebaseConfig = {
             apiKey: "AIzaSyDscUEe35RSeT1PE5zMcoV4_BA6sKTJVnI",
-            authDomain: "expo-4ac37.firebaseapp.com",
-            databaseURL: "https://expo-4ac37-default-rtdb.firebaseio.com",
-             projectId: "expo-4ac37",
-             storageBucket: "expo-4ac37.firebasestorage.app",
-            messagingSenderId: "194045254565",
-             appId: "1:194045254565:web:267ff1ea9e0f61fced664c",
-            measurementId: "G-T7M07E5BHE"
+    authDomain: "expo-4ac37.firebaseapp.com",
+  databaseURL: "https://expo-4ac37-default-rtdb.firebaseio.com",
+  projectId: "expo-4ac37",
+  storageBucket: "expo-4ac37.firebasestorage.app",
+  messagingSenderId: "194045254565",
+  appId: "1:194045254565:web:267ff1ea9e0f61fced664c",
+  measurementId: "G-T7M07E5BHE"
         };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-        const contadorRef = database.ref('ContadorGlobal');  // Referência ao contador no Firebase
+        const contadorRef = database.ref('contadorGlobal');
 
-        let contador = 0;  // Variável local temporária
-
-        // Carrega o contador do Firebase ao iniciar a página
+        let contador = 0;
         contadorRef.on('value', (snapshot) => {
             contador = snapshot.val() || 0;
             document.getElementById('contador').textContent = `Contador: ${contador}`;
@@ -287,26 +283,22 @@
                     body: formData
                 });
 
+                console.log('Resposta da API:', response);  // Log para depuração
                 if (response.ok) {
-                    // Incrementa o contador no Firebase
-                    contadorRef.transaction((currentCount) => {
-                        return (currentCount || 0) + 1;
-                    });
-                    
+                    contadorRef.transaction((currentCount) => (currentCount || 0) + 1);
                     document.getElementById('nome').value = '';
                     document.getElementById('email').value = '';
                     document.getElementById('telefone').value = '';
                     document.getElementById('tipoUsuario').value = '';
                     document.getElementById('genero').value = '';
-                    
                     showStatus(`Formulário enviado com sucesso! Total de envios: ${contador + 1}`, 'success');
-                    console.log(`Formulário enviado! Nome: ${nome}, E-mail: ${email}, Telefone: ${telefone}, Tipo: ${tipoUsuario}, Gênero: ${genero}, Contador: ${contador + 1}`);
                 } else {
-                    throw new Error('Erro na resposta da API');
+                    const errorMessage = await response.text();  // Obtém a mensagem de erro
+                    throw new Error(`Erro ${response.status}: ${errorMessage}`);
                 }
             } catch (error) {
-                showStatus('Erro ao enviar o formulário. Tente novamente.', 'error');
-                console.error('Erro no envio:', error);
+                showStatus('Erro ao enviar o formulário. Verifique o console para mais detalhes.', 'error');
+                console.error('Detalhes do erro:', error);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Enviar';
@@ -342,7 +334,7 @@
             }
             
             if (confirm(`Tem certeza que deseja definir o contador para ${novoValor}?`)) {
-                contadorRef.set(novoValor);  // Atualiza no Firebase
+                contadorRef.set(novoValor);
                 showStatus(`Contador atualizado para ${novoValor}!`, 'success');
                 console.log(`Contador atualizado para: ${novoValor}`);
             }
